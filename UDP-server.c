@@ -43,7 +43,8 @@ int initialization();
 void execution( int internet_socket );
 void cleanup( int internet_socket );
 int randomNumber();
-uint16_t sendNumber(int internet_socket,struct sockaddr_storage client_internet_address,socklen_t client_internet_address_length);
+uint16_t sendNumber(int internet_socket,struct sockaddr_storage client_internet_address,socklen_t client_internet_address_length,int number_of_bytes_send);
+void receiveNumber(char buffer[1000],uint16_t highestNumber,int internet_socket,struct sockaddr_storage client_internet_address,socklen_t client_internet_address_length,int number_of_bytes_received);
 
 int main( int argc, char * argv[] )
 {
@@ -130,14 +131,14 @@ int initialization()
 
 void execution( int internet_socket )
 {
-    int number_of_bytes_send = 0;
     //Step 2.1
+    int number_of_bytes_send = 0;
     int number_of_bytes_received = 0;
     char buffer[1000];
     struct sockaddr_storage client_internet_address;
     socklen_t client_internet_address_length = sizeof client_internet_address;
 
-    while(strcmp(buffer,"GO")!=0){ //need to receive GO before sending the numbers //TODO PUT IN FUNCTION
+    while(strcmp(buffer,"GO")!=0){ //need to receive GO before sending the numbers
         number_of_bytes_received = recvfrom( internet_socket, buffer, ( sizeof buffer ) - 1, 0, (struct sockaddr *) &client_internet_address, &client_internet_address_length );
         if( number_of_bytes_received == -1 )
         {
@@ -151,36 +152,13 @@ void execution( int internet_socket )
     }
 
     //Step 2.2
-    uint16_t highestNumber=sendNumber(internet_socket,client_internet_address,client_internet_address_length);
+    uint16_t highestNumber=sendNumber(internet_socket,client_internet_address,client_internet_address_length,number_of_bytes_send);
 
-    //uint16_t host_num = 0;
-    while(ntohs(buffer) != highestNumber){ //need to receive highest number //TODO PUT IN FUNCTION
-        number_of_bytes_received = recvfrom( internet_socket, buffer, ( sizeof buffer ) - 1, 0, (struct sockaddr *) &client_internet_address, &client_internet_address_length );
-        if( number_of_bytes_received == -1 )
-        {
-            perror( "recvfrom" );
-        }
-        else
-        {
-            buffer[number_of_bytes_received] = '\0';
-            printf( "Received : %s\n", buffer );
-        }
-    }
-    sendNumber(internet_socket,client_internet_address,client_internet_address_length);
+    receiveNumber(buffer,highestNumber,internet_socket,client_internet_address,client_internet_address_length,number_of_bytes_received);
 
-    //TODO PUT IN FUNCTION AND CALL IT
-    while(ntohs(buffer) != highestNumber){ //need to receive highest number //TODO PUT IN FUNCTION
-        number_of_bytes_received = recvfrom( internet_socket, buffer, ( sizeof buffer ) - 1, 0, (struct sockaddr *) &client_internet_address, &client_internet_address_length );
-        if( number_of_bytes_received == -1 )
-        {
-            perror( "recvfrom" );
-        }
-        else
-        {
-            buffer[number_of_bytes_received] = '\0';
-            printf( "Received : %s\n", buffer );
-        }
-    }
+    highestNumber=sendNumber(internet_socket,client_internet_address,client_internet_address_length,number_of_bytes_send);
+
+    receiveNumber(buffer,highestNumber,internet_socket,client_internet_address,client_internet_address_length,number_of_bytes_received);
 
     number_of_bytes_send = sendto( internet_socket,"OK",2, 0, (struct sockaddr *) &client_internet_address, client_internet_address_length );
     if( number_of_bytes_send == -1 )
@@ -201,8 +179,7 @@ int randomNumber(){
     return randomNumber;
 }
 
-uint16_t sendNumber(int internet_socket,struct sockaddr_storage client_internet_address,socklen_t client_internet_address_length){
-    int number_of_bytes_send = 0;
+uint16_t sendNumber(int internet_socket,struct sockaddr_storage client_internet_address,socklen_t client_internet_address_length,int number_of_bytes_send){
     uint16_t number = 0;
     uint16_t net_num = htons(number);
     uint16_t highestNumber = 0;
@@ -220,3 +197,17 @@ uint16_t sendNumber(int internet_socket,struct sockaddr_storage client_internet_
     return highestNumber;
 }
 
+void receiveNumber(char buffer[1000],uint16_t highestNumber,int internet_socket,struct sockaddr_storage client_internet_address,socklen_t client_internet_address_length,int number_of_bytes_received){
+    while(ntohs(buffer) != highestNumber){ //need to receive highest number //TODO PUT IN FUNCTION
+        number_of_bytes_received = recvfrom( internet_socket, buffer, ( sizeof buffer ) - 1, 0, (struct sockaddr *) &client_internet_address, &client_internet_address_length );
+        if( number_of_bytes_received == -1 )
+        {
+            perror( "recvfrom" );
+        }
+        else
+        {
+            buffer[number_of_bytes_received] = '\0';
+            printf( "Received : %s\n", buffer );
+        }
+    }
+}
