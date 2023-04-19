@@ -180,9 +180,9 @@ void execution( int internet_socket )
     }
 
     //TODO PUT IN FUNCTION AND CALL IT
-    uint16_t number = 0;
-    uint16_t net_num = htons(number);
-    uint16_t highestNumber = 0;
+    number = 0;
+    net_num = htons(number);
+    highestNumber = 0;
     for(int i=0;i<42;i++){
         number = randomNumber();
         if(number > highestNumber){
