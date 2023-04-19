@@ -41,8 +41,9 @@ int OSCleanup( void ) {}
 
 int initialization();
 void execution( int internet_socket );
-int randomNumber();
 void cleanup( int internet_socket );
+int randomNumber();
+uint16_t sendNumber(int internet_socket,struct sockaddr_storage client_internet_address,socklen_t client_internet_address_length);
 
 int main( int argc, char * argv[] )
 {
@@ -129,6 +130,7 @@ int initialization()
 
 void execution( int internet_socket )
 {
+    int number_of_bytes_send = 0;
     //Step 2.1
     int number_of_bytes_received = 0;
     char buffer[1000];
@@ -149,21 +151,7 @@ void execution( int internet_socket )
     }
 
     //Step 2.2
-    int number_of_bytes_send = 0;
-    uint16_t number = 0;
-    uint16_t net_num = htons(number);
-    uint16_t highestNumber = 0;
-    for(int i=0;i<42;i++){
-        number = randomNumber();
-        if(number > highestNumber){
-            highestNumber = number;
-        }
-        number_of_bytes_send = sendto( internet_socket, &net_num, sizeof(net_num), 0, (struct sockaddr *) &client_internet_address, client_internet_address_length );
-        if( number_of_bytes_send == -1 )
-        {
-            perror( "sendto" );
-        }
-    }
+    uint16_t highestNumber=sendNumber(internet_socket,client_internet_address,client_internet_address_length);
 
     //uint16_t host_num = 0;
     while(ntohs(buffer) != highestNumber){ //need to receive highest number //TODO PUT IN FUNCTION
@@ -178,22 +166,7 @@ void execution( int internet_socket )
             printf( "Received : %s\n", buffer );
         }
     }
-
-    //TODO PUT IN FUNCTION AND CALL IT
-    number = 0;
-    net_num = htons(number);
-    highestNumber = 0;
-    for(int i=0;i<42;i++){
-        number = randomNumber();
-        if(number > highestNumber){
-            highestNumber = number;
-        }
-        number_of_bytes_send = sendto( internet_socket, &net_num, sizeof(net_num), 0, (struct sockaddr *) &client_internet_address, client_internet_address_length );
-        if( number_of_bytes_send == -1 )
-        {
-            perror( "sendto" );
-        }
-    }
+    sendNumber(internet_socket,client_internet_address,client_internet_address_length);
 
     //TODO PUT IN FUNCTION AND CALL IT
     while(ntohs(buffer) != highestNumber){ //need to receive highest number //TODO PUT IN FUNCTION
@@ -224,6 +197,26 @@ void cleanup( int internet_socket )
 
 int randomNumber(){
     uint16_t randomNumber = 0;
-    randomNumber = rand() % 100 //random number between 0 and 99
+    randomNumber = rand() % 100; //random number between 0 and 99
     return randomNumber;
 }
+
+uint16_t sendNumber(int internet_socket,struct sockaddr_storage client_internet_address,socklen_t client_internet_address_length){
+    int number_of_bytes_send = 0;
+    uint16_t number = 0;
+    uint16_t net_num = htons(number);
+    uint16_t highestNumber = 0;
+    for(int i=0;i<42;i++){
+        number = randomNumber();
+        if(number > highestNumber){
+            highestNumber = number;
+        }
+        number_of_bytes_send = sendto( internet_socket, &net_num, sizeof(net_num), 0, (struct sockaddr *) &client_internet_address, client_internet_address_length );
+        if( number_of_bytes_send == -1 )
+        {
+            perror( "sendto" );
+        }
+    }
+    return highestNumber;
+}
+
