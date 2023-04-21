@@ -110,6 +110,7 @@ void execution( int internet_socket, struct sockaddr * internet_address, socklen
 // Initialize counters for the number of times to execute the loop
     int num_loops = 2;
     int num_responses = 0;
+    int number_of_bytes_send = 0;
 
 // Loop until you have received two responses
     while (num_responses < num_loops) {
@@ -118,7 +119,7 @@ void execution( int internet_socket, struct sockaddr * internet_address, socklen
         uint16_t previous_number = 0;
 
         //Step 2.1
-        int number_of_bytes_send = 0;
+
         number_of_bytes_send = sendto(internet_socket, "GO", 16, 0, internet_address, internet_address_length);
         if (number_of_bytes_send == -1) {
             perror("sendto");
@@ -147,21 +148,27 @@ void execution( int internet_socket, struct sockaddr * internet_address, socklen
             printf("Highest number: %d\n", highest_number);
 
             // Send back the highest number every 1 second until you receive another 40 numbers
-            time_t start_time = time(NULL);
+            /*time_t start_time = time(NULL);
             while (difftime(time(NULL), start_time) < 1 && num_responses == 0) {
-                char response[3];
+                */char response[3];
                 sprintf(response, "%02d", highest_number);
                 number_of_bytes_send = sendto(internet_socket, response, 2, 0, internet_address,
                                               internet_address_length);
-                if (number_of_bytes_send == -1) {
+               if (number_of_bytes_send == -1) {
                     perror("sendto");
                 }
-            }
+            //}
 
             // Update the response counter if you have received the 40 numbers
             num_responses++;
         }
     }
+    number_of_bytes_send = sendto(internet_socket, "OK", 2, 0, internet_address,
+                                  internet_address_length);
+    if (number_of_bytes_send == -1) {
+        perror("sendto");
+    }
+
 }
 
 

@@ -186,6 +186,8 @@ uint16_t sendNumber(int internet_socket,struct sockaddr_storage client_internet_
     //loop 42 times
     for(int i=0;i<42;i++){
         number = randomNumber();//generate a random number
+        printf("random number = %d\n",number);
+        net_num = htons(number);
         if(number > highestNumber){
             highestNumber = number;//keep track of the highest number
         }
