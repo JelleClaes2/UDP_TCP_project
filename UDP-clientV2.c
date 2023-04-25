@@ -57,9 +57,6 @@ int main(int argc, char *argv[]) {
         perror("setsockopt failed\n");
     }
 
-    if (setsockopt (internet_socket, SOL_SOCKET, SO_SNDTIMEO, &timeout,sizeof timeout) < 0){
-        perror("setsockopt failed\n");
-    }
 
 
     execution(internet_socket, internet_address, internet_address_length);
@@ -136,8 +133,6 @@ void execution(int internet_socket, struct sockaddr *internet_address, socklen_t
 
     while (num_responses < num_loops) {
 
-
-
         for ( i = 0; i < 42; i++) {
              number_of_bytes_received = recvfrom(internet_socket, (char *)&(buffer[i]), sizeof(buffer[i]), 0, NULL, NULL);
             if (number_of_bytes_received == -1) {
@@ -166,7 +161,7 @@ void execution(int internet_socket, struct sockaddr *internet_address, socklen_t
         }
         highest_net_number = htons(highest_number);
         //while (1) {
-        number_of_bytes_send = sendto(internet_socket, (const char*)&highest_net_number, sizeof(highest_number), 0, internet_address, internet_address_length);
+        number_of_bytes_send = sendto(internet_socket, (const char*)&highest_net_number, sizeof(highest_net_number), 0, internet_address, internet_address_length);
         if (number_of_bytes_send == -1) {
             perror("sendto");
             break;
