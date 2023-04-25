@@ -51,7 +51,7 @@ int main(int argc, char *argv[]) {
     int internet_socket = initialization(&internet_address, &internet_address_length);
 
     struct timeval timeout;
-    timeout.tv_sec = 10;
+    timeout.tv_sec = 1;
     timeout.tv_usec = 0;
     if (setsockopt(internet_socket, SOL_SOCKET, SO_RCVTIMEO, &timeout,sizeof timeout) < 0){
         perror("setsockopt failed\n");

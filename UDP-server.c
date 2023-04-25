@@ -55,6 +55,13 @@ int main( int argc, char * argv[] )
 
     int internet_socket = initialization();
 
+   /* struct timeval timeout;
+    timeout.tv_sec = 3;
+    timeout.tv_usec = 0;
+    if (setsockopt(internet_socket, SOL_SOCKET, SO_RCVTIMEO, &timeout,sizeof timeout) < 0){
+        perror("setsockopt failed\n");
+    }*/
+
     //execute the code for the server
 
     execution( internet_socket );
