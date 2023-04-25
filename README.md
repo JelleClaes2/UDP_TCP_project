@@ -5,15 +5,15 @@
 
 ## Checklist
 
-- [ ] [1] UDP socket is made correctly and connects.
-- [ ] [2] UDP client sends 'GO' and is received by the UDP server.
-- [ ] [3] UDP server sends a max of 42 random numbers in network-byte-order and UDP client receives this data.
-- [ ] [4] UDP client sends highest number back. UDP server expects this return.
-- [ ] [5] UDP client resends highest number after timeout of 1 second. UDP server expects answer in 3 seconds.
-- [ ] [6] After a couple resends, UDP server will send next 42 random numbers. UDP-client stops sending highest number and receives.
-- [ ] [7] UDP client sends highest number back. UDP server expects this return.
-- [ ] [8] UDP client resends highest number after timeout of 1 second. UDP server expects answer in 3 seconds.
-- [ ] [9] After a couple resends, UDP server will send 'OK' and connection is cut off.
+- [x] [1] UDP socket is made correctly and connects.
+- [x] [2] UDP client sends 'GO' and is received by the UDP server.
+- [x] [3] UDP server sends a max of 42 random numbers in network-byte-order and UDP client receives this data.
+- [x] [4] UDP client sends highest number back. UDP server expects this return.
+- [x] [5] UDP client resends highest number after timeout of 1 second. UDP server expects answer in 3 seconds.
+- [x] [6] After a couple resends, UDP server will send next 42 random numbers. UDP-client stops sending highest number and receives.
+- [x] [7] UDP client sends highest number back. UDP server expects this return.
+- [x] [8] UDP client resends highest number after timeout of 1 second. UDP server expects answer in 3 seconds.
+- [x] [9] After a couple resends, UDP server will send 'OK' and connection is cut off.
 - [ ] [10] The TCP communication will start when UDP connection is shut off without human interference.
 - [ ] [11] TCP socket is correctly made and connects.
 - [ ] [12] TCP client sends a random mathematical operation, the TCP server receives this and splits it up.
