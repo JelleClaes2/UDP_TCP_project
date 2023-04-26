@@ -138,9 +138,12 @@ int connection( int internet_socket )
 }
 
 void execution(int internet_socket) {
+    char buffer[1000];
+    int number_of_bytes_received;
     while (1) {
         // Step 3.1
-        int number_of_bytes_received = 0;
+        memset(buffer, 0, sizeof(buffer));
+        number_of_bytes_received = 0;
         char buffer[1000];
         number_of_bytes_received = recv(internet_socket, buffer, (sizeof buffer) - 1, 0);
         if (number_of_bytes_received == -1) {
@@ -149,9 +152,34 @@ void execution(int internet_socket) {
         } else if (number_of_bytes_received == 0) {
             printf("Client disconnected\n");
             break;
-        } else {
+        }
+
+        buffer[number_of_bytes_received] = '\0';
+        if (strcmp(buffer, "STOP\n") == 0) {
+            printf("Received Stop\n");
+            send(internet_socket, "OK\n", strlen("OK\n"), 0);
+            break;
+        }
+        printf("Received message: %s", buffer);
+        send(internet_socket, buffer, strlen(buffer), 0);
+    }
+
+        while (1){
+            memset(buffer, 0 , sizeof(buffer));
+            number_of_bytes_received = recv(internet_socket, buffer, (sizeof buffer) -1 , 0);
+            if(number_of_bytes_received == -1){
+                perror("recv");
+                break;
+            }
+            else if(number_of_bytes_received == 0){
+                printf("Client disconnected\n");
+                break;
+            }
             buffer[number_of_bytes_received] = '\0';
-            printf("Received : %s\n", buffer);
+            if(strcmp(buffer, "KTNXBYE\n") == 0){
+                printf("received KTNXBYE\n");
+                break;
+            }
 
             // Step 3.2: parse the operation
             int num1, num2;
@@ -198,7 +226,7 @@ void execution(int internet_socket) {
             }
         }
     }
-}
+
 
 
 void cleanup( int internet_socket, int client_internet_socket )
