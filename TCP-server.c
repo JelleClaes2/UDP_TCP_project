@@ -144,7 +144,7 @@ void execution(int internet_socket) {
         // Step 3.1
         memset(buffer, 0, sizeof(buffer));
         number_of_bytes_received = 0;
-        char buffer[1000];
+        //char buffer[1000];
         number_of_bytes_received = recv(internet_socket, buffer, (sizeof buffer) - 1, 0);
         if (number_of_bytes_received == -1) {
             perror("recv");
@@ -158,13 +158,23 @@ void execution(int internet_socket) {
         if (strcmp(buffer, "STOP\n") == 0) {
             printf("Received Stop\n");
             send(internet_socket, "OK\n", strlen("OK\n"), 0);
-            break;
-        }
-        printf("Received message: %s", buffer);
-        send(internet_socket, buffer, strlen(buffer), 0);
-    }
 
-        while (1){
+            number_of_bytes_received = recv(internet_socket, buffer, (sizeof buffer) -1 , 0);
+            if(number_of_bytes_received == -1){
+                perror("recv");
+                break;
+            }
+            buffer[number_of_bytes_received] = '\0';
+            if(strcmp(buffer, "KTNXBYE\n") == 0){
+                printf("received KTNXBYE\n");
+                break;
+            }
+        }
+        printf("Received message: %s\n", buffer);
+        //send(internet_socket, buffer, strlen(buffer), 0);
+        // }
+
+        /*while (1){
             memset(buffer, 0 , sizeof(buffer));
             number_of_bytes_received = recv(internet_socket, buffer, (sizeof buffer) -1 , 0);
             if(number_of_bytes_received == -1){
@@ -179,58 +189,60 @@ void execution(int internet_socket) {
             if(strcmp(buffer, "KTNXBYE\n") == 0){
                 printf("received KTNXBYE\n");
                 break;
-            }
+            }*/
 
-            // Step 3.2: parse the operation
-            int num1, num2;
-            char op;
-            if (sscanf(buffer, "%d %c %d", &num1, &op, &num2) != 3) {
-                printf("Invalid operation format\n");
-                continue;
-            }
+        // Step 3.2: parse the operation
+        int num1, num2;
+        char op;
+        if (sscanf(buffer, "%d %c %d", &num1, &op, &num2) != 3) {
+            printf("Invalid operation format\n");
+            continue;
+        }
 
-            // Step 3.3: perform the calculation
-            int result;
-            switch (op) {
-                case '+':
-                    result = num1 + num2;
-                    break;
-                case '-':
-                    result = num1 - num2;
-                    break;
-                case '*':
-                    result = num1 * num2;
-                    break;
-                case '/':
-                    if(num2 == 0){
-                        printf("Division By 0\n");
-                        int number_of_bytes_sent = send(internet_socket, "Division by 0\n", strlen("Division by 0\n"), 0);
-                        if (number_of_bytes_sent == -1) {
-                            perror("send");
-                            break;
-                        }
-                    }
-                    else {
-                        result = num1 / num2;
-                    }
-                    break;
-                default:
-                    printf("Invalid operator\n");
-                    continue;
-            }
-
-            // Step 3.4: send the result back to the client
-            char result_str[100];
-            sprintf(result_str, "%c" , result);
-            int number_of_bytes_sent = send(internet_socket, result_str, strlen(result_str), 0);
-            if (number_of_bytes_sent == -1) {
-                perror("send");
+        // Step 3.3: perform the calculation
+        float result;
+        switch (op) {
+            case '+':
+                result = num1 + num2;
                 break;
-            } else {
-                printf("Sent: %s\n", result_str);
-            }
+            case '-':
+                result = num1 - num2;
+                break;
+            case '*':
+                result = num1 * num2;
+                break;
+            case '/':
+                if(num2 == 0){
+                    printf("Division By 0\n");
+                    int number_of_bytes_sent = send(internet_socket, "Division by 0\n", strlen("Division by 0\n"), 0);
+                    if (number_of_bytes_sent == -1) {
+                        perror("send");
+                        break;
+                    }
+                }
+                else {
+                    result = num1 / (float) num2;
+                }
+                break;
+            default:
+                printf("Invalid operator\n");
+                continue;
+        }
+
+        // Step 3.4: send the result back to the client
+        char result_str[100];
+        snprintf(result_str, 5 , "%f" , result);
+        printf("result string= %s\n",result_str);
+        printf("result= %f\n",result);
+        int number_of_bytes_sent = send(internet_socket, result_str, strlen(result_str), 0);
+        if (number_of_bytes_sent == -1) {
+            perror("send");
+            break;
+        } else {
+            printf("Sent: %s\n", result_str);
         }
     }
+}
 
 
 
