@@ -203,7 +203,12 @@ void execution(int internet_socket) {
                     break;
                 case '/':
                     if(num2 == 0){
-                        printf("Division By 0\n");;
+                        printf("Division By 0\n");
+                        int number_of_bytes_sent = send(internet_socket, "Division by 0\n", strlen("Division by 0\n"), 0);
+                        if (number_of_bytes_sent == -1) {
+                            perror("send");
+                            break;
+                        }
                     }
                     else {
                         result = num1 / num2;
