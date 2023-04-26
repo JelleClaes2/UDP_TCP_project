@@ -221,7 +221,7 @@ void execution(int internet_socket) {
 
             // Step 3.4: send the result back to the client
             char result_str[100];
-            snprintf(result_str, sizeof(result_str), "%d", result);
+            sprintf(result_str, "%c" , result);
             int number_of_bytes_sent = send(internet_socket, result_str, strlen(result_str), 0);
             if (number_of_bytes_sent == -1) {
                 perror("send");
