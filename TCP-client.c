@@ -38,13 +38,14 @@ void OSCleanup( void )
 
 #include <stdint.h>
 #include <time.h>
+#include <math.h>
 
 int initialization();
 void execution( int internet_socket );
 void cleanup( int internet_socket );
-int randomNumber();
+uint16_t randomNumber();
 char randomOperation();
-void checkAnswer(char buffer[100],int number1,int number2,char operation);
+void checkAnswer(char buffer[100],float number1,float number2,char operation);
 
 int main( int argc, char * argv[] )
 {
@@ -121,18 +122,20 @@ void execution( int internet_socket )
     uint16_t number1 = 0;
     uint16_t number2 = 0;
     char operation = '0';
-    char sendOperation[7];
+    char sendOperation[15];
     int number_of_bytes_send = 0;
     int number_of_bytes_received = 0;
     char buffer[1000];
-    uint16_t amountOfOperations = 0;
+    int amountOfOperations = 0;
 
     amountOfOperations = (rand() % 20) +1;
+    printf("amountOfOperations = %d\n",amountOfOperations);
 
     for(int i=0;i<amountOfOperations;i++){
+
         number1 = randomNumber();
         number2 = randomNumber();
-        operation = randomNumber();
+        operation = randomOperation();
 
         sprintf(sendOperation,"%d %c %d",number1,operation,number2);
 
@@ -205,7 +208,7 @@ void cleanup( int internet_socket )
     close( internet_socket );
 }
 
-int randomNumber(){
+uint16_t randomNumber(){
     //generate a random number between 0 and 99
     uint16_t randomNumber = 0;
     randomNumber = rand() % 100;
@@ -232,9 +235,9 @@ char randomOperation(){
     return randomOperation;
 }
 
-void checkAnswer(char buffer[100],int number1,int number2,char operation){
-    uint16_t result=0;
-    uint16_t expectedVal = 0;
+void checkAnswer(char buffer[100],float number1,float number2,char operation){
+    float result=0;
+    float expectedVal = 0;
 
     switch (operation) {
         case '+':
@@ -251,16 +254,19 @@ void checkAnswer(char buffer[100],int number1,int number2,char operation){
                 printf("Division By 0\n");;
             }
             else {
-                expectedVal = number1 / number2;
+                expectedVal = number1 / (float)number2;
+                expectedVal = floorf(expectedVal *100 ) / 100; //round down to 2 decimals
             }
             break;
         default:
             printf("Invalid operator\n");
     }
-    result = atoi(buffer);
+    result = atof(buffer);
+    printf("expected val = %f\n",expectedVal);
+    printf("received result = %f\n",result);
     if(result == expectedVal){
-        printf("correct");
+        printf("correct\n");
     } else {
-        printf("incorrect");
+        printf("incorrect\n");
     }
 }
