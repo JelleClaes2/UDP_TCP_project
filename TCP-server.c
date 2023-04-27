@@ -23,17 +23,17 @@ void OSCleanup( void )
 #define perror(string) fprintf( stderr, string ": WSA errno = %d\n", WSAGetLastError() )
 #else
 #include <sys/socket.h> //for sockaddr, socket, socket
-	#include <sys/types.h> //for size_t
-	#include <netdb.h> //for getaddrinfo
-	#include <netinet/in.h> //for sockaddr_in
-	#include <arpa/inet.h> //for htons, htonl, inet_pton, inet_ntop
-	#include <errno.h> //for errno
-	#include <stdio.h> //for fprintf, perror
-	#include <unistd.h> //for close
-	#include <stdlib.h> //for exit
-	#include <string.h> //for memset
-	void OSInit( void ) {}
-	void OSCleanup( void ) {}
+#include <sys/types.h> //for size_t
+#include <netdb.h> //for getaddrinfo
+#include <netinet/in.h> //for sockaddr_in
+#include <arpa/inet.h> //for htons, htonl, inet_pton, inet_ntop
+#include <errno.h> //for errno
+#include <stdio.h> //for fprintf, perror
+#include <unistd.h> //for close
+#include <stdlib.h> //for exit
+#include <string.h> //for memset
+void OSInit( void ) {}
+void OSCleanup( void ) {}
 #endif
 
 int initialization();
