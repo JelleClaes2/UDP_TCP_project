@@ -14,7 +14,7 @@
 - [x] [7] UDP client sends highest number back. UDP server expects this return.
 - [x] [8] UDP client resends highest number after timeout of 1 second. UDP server expects answer in 3 seconds.
 - [x] [9] After a couple resends, UDP server will send 'OK' and connection is cut off.
-- [ ] [10] The TCP communication will start when UDP connection is shut off without human interference.
+- [x] [10] The TCP communication will start when UDP connection is shut off without human interference.
 - [x] [11] TCP socket is correctly made and connects.
 - [x] [12] TCP client sends a random mathematical operation, the TCP server receives this and splits it up.
 - [x] [13] TCP server returns the correct solution of the operation to the TCP client who accepts and double checks.
