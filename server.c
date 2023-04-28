@@ -359,25 +359,6 @@ void executionTCP(int internet_socket) {
             }
         }
         printf("Received message: %s\n", buffer);
-        //send(internet_socket, buffer, strlen(buffer), 0);
-        // }
-
-        /*while (1){
-            memset(buffer, 0 , sizeof(buffer));
-            number_of_bytes_received = recv(internet_socket, buffer, (sizeof buffer) -1 , 0);
-            if(number_of_bytes_received == -1){
-                perror("recv");
-                break;
-            }
-            else if(number_of_bytes_received == 0){
-                printf("Client disconnected\n");
-                break;
-            }
-            buffer[number_of_bytes_received] = '\0';
-            if(strcmp(buffer, "KTNXBYE\n") == 0){
-                printf("received KTNXBYE\n");
-                break;
-            }*/
 
         // Step 3.2: parse the operation
         int num1, num2;

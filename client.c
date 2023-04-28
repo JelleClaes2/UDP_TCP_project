@@ -200,20 +200,6 @@ void executionUDP(int internet_socket, struct sockaddr *internet_address, sockle
             perror("sendto");
             break;
         }
-
-        /*number_of_bytes_received = recvfrom(internet_socket, &current_number, sizeof(current_number), 0, NULL, NULL);
-        if (number_of_bytes_received == -1) {
-            perror("recvfrom");
-            continue; // try again
-        }
-
-        current_number = ntohs(current_number);
-        if (number_of_bytes_received == sizeof(current_number)) {
-            break;
-        }*/
-        //}
-
-        //sleep(1);
     }
 
     number_of_bytes_received = recvfrom(internet_socket, (char *)&buffer, sizeof(buffer), 0, NULL, NULL);
@@ -358,13 +344,6 @@ void executionTCP( int internet_socket )
             perror( "send" );
         }
     }
-
-
-    //Step 2.1
-
-
-    //Step 2.2
-
 }
 
 void cleanupTCP( int internet_socket )
@@ -442,4 +421,3 @@ void checkAnswerTCP(char buffer[100],float number1,float number2,char operation)
         printf("incorrect\n");
     }
 }
-
