@@ -64,12 +64,12 @@ int main( int argc, char * argv[] ) {
 
     int internet_socketUDP = initializationUDP();
 
-    /* struct timeval timeout;
-     timeout.tv_sec = 3;
+    struct timeval timeout;
+     timeout.tv_sec = 30;
      timeout.tv_usec = 0;
-     if (setsockopt(internet_socket, SOL_SOCKET, SO_RCVTIMEO, &timeout,sizeof timeout) < 0){
+     if (setsockopt(internet_socketUDP, SOL_SOCKET, SO_RCVTIMEO, &timeout,sizeof timeout) < 0){
          perror("setsockopt failed\n");
-     }*/
+     }
 
     //execute the code for the server
 
@@ -238,6 +238,7 @@ void receiveNumberUDP(char buffer[1000],int internet_socket,struct sockaddr_stor
     if( number_of_bytes_received == -1 )
     {
         perror( "recvfrom" );
+        printf("There wasn't received anything within 3 seconds\n");
     }
     else
     {
