@@ -23,5 +23,5 @@
 - [x] [16] TCP client continues to send random mathematical operations, the TCP server receives these and splits them up until it receives "STOP", this is received correctly.
 - [x] [17] TCP server sends "OK", TCP client returns with "KTNXBYE".
 - [x] [18] TCP client shuts off connection and TCP server waits to shut off connection.
-- [ ] [19] Full program works without crashing and uses its resources efficiently.
-- [ ] [20] Professional GitHub with code, multiple commits and explanations.
+- [x] [19] Full program works without crashing and uses its resources efficiently.
+- [x] [20] Professional GitHub with code, multiple commits and explanations.
