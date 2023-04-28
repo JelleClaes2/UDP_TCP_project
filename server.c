@@ -409,8 +409,6 @@ void executionTCP(int internet_socket) {
         // Step 3.4: send the result back to the client
         char result_str[100];
         snprintf(result_str, 5 , "%f" , result);
-        printf("result string= %s\n",result_str);
-        printf("result= %f\n",result);
         int number_of_bytes_sent = send(internet_socket, result_str, strlen(result_str), 0);
         if (number_of_bytes_sent == -1) {
             perror("send");

@@ -413,8 +413,6 @@ void checkAnswerTCP(char buffer[100],float number1,float number2,char operation)
             printf("Invalid operator\n");
     }
     result = atof(buffer);
-    printf("expected val = %f\n",expectedVal);
-    printf("received result = %f\n",result);
     if(result == expectedVal){
         printf("correct\n");
     } else {
