@@ -64,12 +64,6 @@ int main( int argc, char * argv[] ) {
 
     int internet_socketUDP = initializationUDP();
 
-    /*struct timeval timeout;
-     timeout.tv_sec = 3;
-     timeout.tv_usec = 0;
-     if (setsockopt(internet_socketUDP, SOL_SOCKET, SO_RCVTIMEO, &timeout,sizeof timeout) < 0){
-         perror("setsockopt failed\n");
-     }*/
 
     //execute the code for the server
 
