@@ -1,3 +1,4 @@
+//library's for windows
 #ifdef _WIN32
 #define _WIN32_WINNT _WIN32_WINNT_WIN7
 #include <winsock2.h> //for all socket programming
@@ -21,6 +22,8 @@ void OSCleanup( void )
     WSACleanup();
 }
 #define perror(string) fprintf( stderr, string ": WSA errno = %d\n", WSAGetLastError() )
+
+//library's for linux
 #else
 #include <sys/socket.h> //for sockaddr, socket, socket
 	#include <sys/types.h> //for size_t
@@ -40,10 +43,12 @@ void OSCleanup( void )
 #include <time.h>
 #include <math.h>
 
+//functions for UDP
 int initializationUDP( struct sockaddr ** internet_address, socklen_t * internet_address_length );
 void executionUDP( int internet_socket, struct sockaddr * internet_address, socklen_t internet_address_length );
 void cleanupUDP( int internet_socket, struct sockaddr * internet_address );
 
+//functions for TCP
 int initializationTCP();
 void executionTCP( int internet_socket );
 void cleanupTCP( int internet_socket );
@@ -59,6 +64,7 @@ int main(int argc, char *argv[]) {
     printf("Start UDP client\n");
     printf("\n");
 
+    //start up socket and connection
     OSInit();
 
 
@@ -66,6 +72,7 @@ int main(int argc, char *argv[]) {
     socklen_t internet_address_length = 0;
     int internet_socketUDP = initializationUDP(&internet_address, &internet_address_length);
 
+    //setup time out receive 1 second
     struct timeval timeout;
     timeout.tv_sec = 1;
     timeout.tv_usec = 0;
@@ -75,8 +82,10 @@ int main(int argc, char *argv[]) {
 
 
 
+    //execute UDP
     executionUDP(internet_socketUDP, internet_address, internet_address_length);
 
+    //clean up
     cleanupUDP(internet_socketUDP, internet_address);
 
     OSCleanup();
@@ -86,12 +95,16 @@ int main(int argc, char *argv[]) {
     printf("\n");
     printf("Start TCP client\n");
     printf("\n");
+
+    //start TCP socket and connection
     OSInit();
 
     int internet_socketTCP = initializationTCP();
 
+    //execution TCP
     executionTCP( internet_socketTCP );
 
+    //clean up everything
     cleanupTCP( internet_socketTCP );
 
     OSCleanup();
@@ -104,7 +117,7 @@ int main(int argc, char *argv[]) {
 
 int initializationUDP( struct sockaddr ** internet_address, socklen_t * internet_address_length )
 {
-    //Step 1.1
+    //set up internet address
     struct addrinfo internet_address_setup;
     struct addrinfo * internet_address_result;
     memset( &internet_address_setup, 0, sizeof internet_address_setup );
@@ -117,11 +130,11 @@ int initializationUDP( struct sockaddr ** internet_address, socklen_t * internet
         exit( 1 );
     }
 
+    //setup internet socket
     int internet_socket = -1;
     struct addrinfo * internet_address_result_iterator = internet_address_result;
     while( internet_address_result_iterator != NULL )
     {
-        //Step 1.2
         internet_socket = socket( internet_address_result_iterator->ai_family, internet_address_result_iterator->ai_socktype, internet_address_result_iterator->ai_protocol );
         if( internet_socket == -1 )
         {
@@ -129,7 +142,6 @@ int initializationUDP( struct sockaddr ** internet_address, socklen_t * internet
         }
         else
         {
-            //Step 1.3
             *internet_address_length = internet_address_result_iterator->ai_addrlen;
             *internet_address = (struct sockaddr *) malloc( internet_address_result_iterator->ai_addrlen );
             memcpy( *internet_address, internet_address_result_iterator->ai_addr, internet_address_result_iterator->ai_addrlen );
@@ -150,6 +162,7 @@ int initializationUDP( struct sockaddr ** internet_address, socklen_t * internet
 }
 
 void executionUDP(int internet_socket, struct sockaddr *internet_address, socklen_t internet_address_length) {
+    // initialize variabels for UDP execution
     int num_loops = 2;
     int num_responses = 0;
     uint16_t buffer[42];
@@ -160,6 +173,7 @@ void executionUDP(int internet_socket, struct sockaddr *internet_address, sockle
     uint16_t highest_net_number = 0;
     int i = 0;
 
+    //send go
     int number_of_bytes_send = sendto(internet_socket, "GO", 2, 0, internet_address, internet_address_length);
     if (number_of_bytes_send == -1) {
         perror("sendto");
@@ -167,6 +181,7 @@ void executionUDP(int internet_socket, struct sockaddr *internet_address, sockle
 
     while (num_responses < num_loops) {
 
+        //receive 42 numbers
         for ( i = 0; i < 42; i++) {
             number_of_bytes_received = recvfrom(internet_socket, (char *)&(buffer[i]), sizeof(buffer[i]), 0, NULL, NULL);
             if (number_of_bytes_received == -1) {
@@ -174,27 +189,27 @@ void executionUDP(int internet_socket, struct sockaddr *internet_address, sockle
                 break;
             } else
             {
-                //buffer[number_of_bytes_received] = '\0';
                 printf( "Received : %d\n", ntohs(buffer[i]) );
             }
         }
+        //if client received anny numbers initialize for next set of numbers
         if(i != 0)
         {
             num_responses++;
             highest_number = 0;
 
 
+            //search the highest number
             for ( i = 0; i < 42; i++) {
                 current_number = ntohs(buffer[i]);
-                //printf("number = %d\n",current_number);
                 if (current_number > highest_number) {
                     highest_number = current_number;
                 }
             }
 
         }
+        //send the highest number back to the server
         highest_net_number = htons(highest_number);
-        //while (1) {
         number_of_bytes_send = sendto(internet_socket, (const char*)&highest_net_number, sizeof(highest_net_number), 0, internet_address, internet_address_length);
         if (number_of_bytes_send == -1) {
             perror("sendto");
@@ -202,6 +217,7 @@ void executionUDP(int internet_socket, struct sockaddr *internet_address, sockle
         }
     }
 
+    //receive OK
     number_of_bytes_received = recvfrom(internet_socket, (char *)&buffer, sizeof(buffer), 0, NULL, NULL);
     if (number_of_bytes_received == -1) {
         perror("recvfrom");
@@ -215,16 +231,16 @@ void executionUDP(int internet_socket, struct sockaddr *internet_address, sockle
 
 void cleanupUDP( int internet_socket, struct sockaddr * internet_address )
 {
-    //Step 3.2
+    //free internet address
     free( internet_address );
 
-    //Step 3.1
+    //close socket
     close( internet_socket );
 }
 
 int initializationTCP()
 {
-    //Step 1.1
+    //set up internet address
     struct addrinfo internet_address_setup;
     struct addrinfo * internet_address_result;
     memset( &internet_address_setup, 0, sizeof internet_address_setup );
@@ -237,11 +253,11 @@ int initializationTCP()
         exit( 1 );
     }
 
+    //setup socket
     int internet_socket = -1;
     struct addrinfo * internet_address_result_iterator = internet_address_result;
     while( internet_address_result_iterator != NULL )
     {
-        //Step 1.2
         internet_socket = socket( internet_address_result_iterator->ai_family, internet_address_result_iterator->ai_socktype, internet_address_result_iterator->ai_protocol );
         if( internet_socket == -1 )
         {
@@ -249,7 +265,6 @@ int initializationTCP()
         }
         else
         {
-            //Step 1.3
             int connect_return = connect( internet_socket, internet_address_result_iterator->ai_addr, internet_address_result_iterator->ai_addrlen );
             if( connect_return == -1 )
             {
@@ -277,6 +292,7 @@ int initializationTCP()
 
 void executionTCP( int internet_socket )
 {
+    //initialize variables for TCP execution
     uint16_t number1 = 0;
     uint16_t number2 = 0;
     char operation = '0';
@@ -286,18 +302,22 @@ void executionTCP( int internet_socket )
     char buffer[1000];
     int amountOfOperations = 0;
 
+    //generate a number between 1 and 20
     amountOfOperations = (rand() % 20) +1;
     printf("amountOfOperations = %d\n",amountOfOperations);
 
+    //generate random numbers and random operations
     for(int i=0;i<amountOfOperations;i++){
 
         number1 = randomNumberTCP();
         number2 = randomNumberTCP();
         operation = randomOperationTCP();
 
+        //put everything in 1 string
         sprintf(sendOperation,"%d %c %d",number1,operation,number2);
 
 
+        //send string
         number_of_bytes_send = send( internet_socket, (const char*)sendOperation, strlen(sendOperation), 0 );
         if( number_of_bytes_send == -1 )
         {
@@ -306,6 +326,7 @@ void executionTCP( int internet_socket )
 
 
 
+        //receive answer and check the answer
         number_of_bytes_received = recv( internet_socket, buffer, ( sizeof buffer ) - 1, 0 );
         if( number_of_bytes_received == -1 )
         {
@@ -321,12 +342,14 @@ void executionTCP( int internet_socket )
     }
 
 
+    //send STOP if all the mathematical operations
     number_of_bytes_send = send( internet_socket,"STOP\n", strlen("STOP\n"), 0 );
     if( number_of_bytes_send == -1 )
     {
         perror( "send" );
     }
 
+    //receive OK
     number_of_bytes_received = recv( internet_socket, buffer, ( sizeof buffer ) - 1, 0 );
     if( number_of_bytes_received == -1 )
     {
@@ -348,14 +371,13 @@ void executionTCP( int internet_socket )
 
 void cleanupTCP( int internet_socket )
 {
-    //Step 3.2
+    //cleanup socket
     int shutdown_return = shutdown( internet_socket, SD_SEND );
     if( shutdown_return == -1 )
     {
         perror( "shutdown" );
     }
 
-    //Step 3.1
     close( internet_socket );
 }
 
@@ -367,6 +389,8 @@ uint16_t randomNumberTCP(){
 }
 
 char randomOperationTCP(){
+
+    //generate a rondom number between 0 and 3 for a random operation
     uint16_t randomNumberOperation = rand() % 4;
     char randomOperation = '0';
     switch (randomNumberOperation) {
@@ -387,6 +411,7 @@ char randomOperationTCP(){
 }
 
 void checkAnswerTCP(char buffer[100],float number1,float number2,char operation){
+    //check the received value
     float result=0;
     float expectedVal = 0;
 
