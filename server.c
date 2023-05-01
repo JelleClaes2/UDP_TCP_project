@@ -1,4 +1,4 @@
-//library's for windows
+//libraries for windows
 #ifdef _WIN32
 #define _WIN32_WINNT _WIN32_WINNT_WIN7
 #include <winsock2.h> //for all socket programming
@@ -7,7 +7,7 @@
 #include <unistd.h> //for close
 #include <stdlib.h> //for exit
 #include <string.h> //for memset
-void OSInit( void )
+void OSInit( void ) //initializes the Windows Sockets API
 {
     WSADATA wsaData;
     int WSAError = WSAStartup( MAKEWORD( 2, 0 ), &wsaData );
@@ -195,10 +195,10 @@ void executionUDP( int internet_socket )
         perror("setsockopt failed\n");
     }
 
-    //send 42 random numbers
+    //send 42 random numbers 
     sendNumberUDP(internet_socket,client_internet_address,client_internet_address_length,number_of_bytes_send);
 
-    //receive the highest number from the client and check if it was the highest number the server send
+    //receive the highest number from the client.
     receiveNumberUDP(buffer,internet_socket,client_internet_address,client_internet_address_length,number_of_bytes_received);
 
     //send 42 random numbers
@@ -232,7 +232,7 @@ void sendNumberUDP(int internet_socket,struct sockaddr_storage client_internet_a
     uint16_t number = 0;
     uint16_t net_num = htons(number);
 
-    //loop 42 times
+    //loop 42 times and send a random number to the server each time
     for(int i=0;i<42;i++){
         number = randomNumber();//generate a random number
         printf("random number = %d\n",number);
@@ -256,6 +256,7 @@ void receiveNumberUDP(char buffer[1000],int internet_socket,struct sockaddr_stor
     else
     {
         buffer[number_of_bytes_received] = '\0';
+        //print the highest number received from the client
         printf( "Received : %hd\n", ntohs(*((short*)buffer)) );
     }
 }
@@ -342,12 +343,13 @@ void executionTCP(int internet_socket) {
     //initialize variables for TCP execution
     char buffer[1000];
     int number_of_bytes_received;
-    //loops while there has no error accord
+    //loops while there are no errors
     while (1) {
+        //Clear the buffer and reset the number of bytes received
         memset(buffer, 0, sizeof(buffer));
         number_of_bytes_received = 0;
 
-        //receive string
+        //receive string from the client
         number_of_bytes_received = recv(internet_socket, buffer, (sizeof buffer) - 1, 0);
         if (number_of_bytes_received == -1) {
             perror("recv");
@@ -359,7 +361,7 @@ void executionTCP(int internet_socket) {
 
         buffer[number_of_bytes_received] = '\0';
 
-        //if string == STOP\n
+        //if string == STOP\n stop execution and start cleanup
         if (strcmp(buffer, "STOP\n") == 0) {
             printf("Received STOP\n");
 
@@ -386,7 +388,7 @@ void executionTCP(int internet_socket) {
         char op;
         if (sscanf(buffer, "%d %c %d", &num1, &op, &num2) != 3) {
             printf("Invalid operation format\n");
-            continue;
+            continue; //continue the loop to wait for the next message from the client
         }
 
         //perform the calculation
@@ -416,7 +418,7 @@ void executionTCP(int internet_socket) {
                 break;
             default:
                 printf("Invalid operator\n");
-                continue;
+                continue; //Continue the loop to wait for the next message if the data was not sent correctly
         }
 
         //send the result back to the client
